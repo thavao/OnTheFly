@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using OnTheFly.SalesAPI.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<OnTheFlySalesAPIContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OnTheFlySalesAPIContext") ?? throw new InvalidOperationException("Connection string 'OnTheFlySalesAPIContext' not found.")));
 
 // Add services to the container.
 
