@@ -8,10 +8,15 @@ namespace Repositories
     public class SaleRepository
     {
         private readonly string _conn;
+        private readonly string _passengerUri;
+        private readonly string _flightUri;
 
         public SaleRepository()
         {
             _conn = "Data Source=127.0.0.1; Initial Catalog=DbSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
+
+            _passengerUri = "https://localhost:7034";
+            _flightUri = "https://localhost:7034";
         }
 
         public async Task<List<Sale>> GetSale()
@@ -20,8 +25,8 @@ namespace Repositories
             using var connection = new SqlConnection(_conn);
             connection.Open();
 
-            var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
-            var t2 = ApiConsume<List<Flight>>.Get($"https://localhost:7034", $"/GetFlights");
+            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/GetPassengers");
+            var t2 = ApiConsume<List<Flight>>.Get(_flightUri, "/GetFlights");
             var t3 = connection.QueryAsync<dynamic>(Sale.GetPassengers);
 
             await Task.WhenAll(t1, t2, t3);
@@ -31,8 +36,8 @@ namespace Repositories
             var passengersAsDynamic = t3.Result;
 
 
-            if (passengersList == null) return null;
-
+            if (passengersList == null)
+                return null;
 
             foreach (dynamic row in connection.Query<dynamic>(Sale.Get).ToList())
             {
@@ -69,15 +74,13 @@ namespace Repositories
             connection.Open();
 
             dynamic? row = connection.Query<dynamic>(Sale.GetId, new { Id = id }).FirstOrDefault();
-            
+
             if (row == null)
                 return null;
 
-            string query = "Select CpfPassenger FROM PassengerSale  WHERE SaleId = @SaleId";
-            var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
-
-            var t2 = ApiConsume<Flight>.Get($"https://localhost:7034", $"/GetFlights/{row.FlightId}");
-            var t3 = connection.QueryAsync<string>(query, new { SaleId = id });
+            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/GetPassengers");
+            var t2 = ApiConsume<Flight>.Get(_flightUri, $"/GetFlights/{row.FlightId}");
+            var t3 = connection.QueryAsync<string>(Sale.GetPassengersById, new { SaleId = id });
 
             await Task.WhenAll(t1, t2, t3);
 

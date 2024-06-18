@@ -12,6 +12,7 @@ namespace Models
 
         public static readonly string GetId = Get + " WHERE Id = @Id";
         public static readonly string GetPassengers = "Select SaleId, CpfPassenger FROM PassengerSale";
+        public static readonly string GetPassengersById = "Select CpfPassenger FROM PassengerSale WHERE SaleId = @SaleId";
 
         public int Id { get; set; }
         public Flight Flight { get; set; }
