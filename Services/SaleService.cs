@@ -30,7 +30,7 @@ namespace Services
             {
                 return _saleRepository.Post(sale);
 
-            }
+            } 
             return null;
         }
 

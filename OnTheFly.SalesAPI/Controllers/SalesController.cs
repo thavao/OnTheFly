@@ -86,6 +86,7 @@ namespace OnTheFly.SalesAPI.Controllers
 
             SaleService sS = new SaleService();
             sS.Post(sale);
+
             return CreatedAtAction("GetSale", new { id = sale.Id }, sale);
         }
 
