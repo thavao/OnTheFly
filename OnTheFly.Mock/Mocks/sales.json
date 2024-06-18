@@ -1,0 +1,122 @@
+[
+  {
+    "Id": 1,
+    "Flight": {
+      "Id": "1",
+      "Sales": 5,
+      "Status": true
+    },
+    "Passengers": [
+      {
+        "CPF": "11111111111",
+        "Name": "Alice Silva",
+        "DtBirth": "1985-05-10T00:00:00",
+        "Status": true
+      },
+      {
+        "CPF": "22222222222",
+        "Name": "Bruno Costa",
+        "DtBirth": "1990-08-15T00:00:00",
+        "Status": true
+      }
+    ],
+    "Reserved": true,
+    "Sold": false
+  },
+  {
+    "Id": 2,
+    "Flight": {
+      "Id": "2",
+      "Sales": 10,
+      "Status": true
+    },
+    "Passengers": [
+      {
+        "CPF": "33333333333",
+        "Name": "Carlos Pereira",
+        "DtBirth": "1987-12-20T00:00:00",
+        "Status": false
+      },
+      {
+        "CPF": "44444444444",
+        "Name": "Daniela Souza",
+        "DtBirth": "1992-03-25T00:00:00",
+        "Status": true
+      }
+    ],
+    "Reserved": true,
+    "Sold": false
+  },
+  {
+    "Id": 3,
+    "Flight": {
+      "Id": "3",
+      "Sales": 5,
+      "Status": true
+    },
+    "Passengers": [
+      {
+        "CPF": "55555555555",
+        "Name": "Eduardo Lima",
+        "DtBirth": "1980-11-30T00:00:00",
+        "Status": true
+      },
+      {
+        "CPF": "66666666666",
+        "Name": "Fernanda Almeida",
+        "DtBirth": "1995-07-05T00:00:00",
+        "Status": false
+      }
+    ],
+    "Reserved": true,
+    "Sold": false
+  },
+  {
+    "Id": 4,
+    "Flight": {
+      "Id": "4",
+      "Sales": 8,
+      "Status": true
+    },
+    "Passengers": [
+      {
+        "CPF": "77777777777",
+        "Name": "Gabriel Martins",
+        "DtBirth": "1983-09-10T00:00:00",
+        "Status": true
+      },
+      {
+        "CPF": "88888888888",
+        "Name": "Helena Santos",
+        "DtBirth": "1988-01-15T00:00:00",
+        "Status": true
+      }
+    ],
+    "Reserved": true,
+    "Sold": false
+  },
+  {
+    "Id": 5,
+    "Flight": {
+      "Id": "5",
+      "Sales": 10,
+      "Status": true
+    },
+    "Passengers": [
+      {
+        "CPF": "99999999999",
+        "Name": "Igor Ramos",
+        "DtBirth": "1993-04-20T00:00:00",
+        "Status": false
+      },
+      {
+        "CPF": "00000000000",
+        "Name": "Julia Oliveira",
+        "DtBirth": "1989-06-25T00:00:00",
+        "Status": true
+      }
+    ],
+    "Reserved": true,
+    "Sold": false
+  }
+]

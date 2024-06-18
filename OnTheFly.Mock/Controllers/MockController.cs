@@ -1,0 +1,67 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Models;
+using System.Text.Json;
+
+namespace OnTheFly.Mock.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class MockController : ControllerBase
+{
+    private List<Passenger>? _passengers;
+    private List<Flight>? _flights;
+    private List<Sale>? _sales;
+
+
+    public MockController()
+    {
+        string passengersJson = System.IO.File.ReadAllText(@"Mocks/passengers.json");
+        string flightsJson = System.IO.File.ReadAllText(@"Mocks/flights.json");
+        string salesJson = System.IO.File.ReadAllText(@"Mocks/sales.json");
+
+        _passengers = JsonSerializer.Deserialize<List<Passenger>>(passengersJson);
+        _flights = JsonSerializer.Deserialize<List<Flight>>(flightsJson);
+        _sales = JsonSerializer.Deserialize<List<Sale>>(salesJson);
+    }
+
+
+    [HttpGet("/GetFlights")]
+    public List<Flight> GetFlight()
+    {
+        string flightsJson = System.IO.File.ReadAllText(@"Mocks/flights.json");
+        return JsonSerializer.Deserialize<List<Flight>>(flightsJson);
+
+    }
+
+    [HttpGet("/GetFlights/{id}")]
+    public Flight? GetFlight(string id) => _flights.FirstOrDefault(f => f.Id == id);
+
+
+
+    [HttpGet("/GetPassengers")]
+    public List<Passenger> GetPassenger() => _passengers;
+
+    [HttpGet("/GetPassengers/{cpf}")]
+    public Passenger? GetPassenger(string cpf) => _passengers.FirstOrDefault(p => p.CPF == cpf);
+
+
+
+    [HttpGet("/GetSales")]
+    public List<Sale> GetSale() => _sales;
+
+    [HttpGet("/GetSales/{id}")]
+    public Sale? GetSale(int id) => _sales.FirstOrDefault(s => s.Id == id);
+
+
+
+    [HttpPut("/UpdateFlight/{id}")]
+    public void UpdateFlight(string id, [FromBody] Flight flight)
+    {
+        var index = _flights.FindIndex(f => f.Id == id);
+        _flights[index] = flight;
+
+        System.IO.File.WriteAllText("flights.json", JsonSerializer.Serialize(_flights));
+    }
+
+
+}
