@@ -8,7 +8,7 @@ namespace Models
 {
     public class Flight
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public int Sales { get; set; }
         public bool Status { get; set; }
     }
