@@ -25,10 +25,10 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Sale>>> GetSale()
         {
-          if (_context.Sale == null)
-          {
-              return NotFound();
-          }
+            if (_context.Sale == null)
+            {
+                return NotFound();
+            }
             return await _context.Sale.ToListAsync();
         }
 
@@ -36,10 +36,10 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Sale>> GetSale(int id)
         {
-          if (_context.Sale == null)
-          {
-              return NotFound();
-          }
+            if (_context.Sale == null)
+            {
+                return NotFound();
+            }
             var sale = await _context.Sale.FindAsync(id);
 
             if (sale == null)
@@ -86,10 +86,10 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Sale>> PostSale(Sale sale)
         {
-          if (_context.Sale == null)
-          {
-              return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
-          }
+            if (_context.Sale == null)
+            {
+                return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
+            }
             _context.Sale.Add(sale);
             await _context.SaveChangesAsync();
 
@@ -98,24 +98,45 @@ namespace OnTheFly.SalesAPI.Controllers
 
         // DELETE: api/Sales/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSale(int id)
+        public async Task<IActionResult> RemoveSale(int id)
         {
-            if (_context.Sale == null)
-            {
-                return NotFound();
-            }
             var sale = await _context.Sale.FindAsync(id);
             if (sale == null)
             {
+                Console.WriteLine("Venda não localizada.");
                 return NotFound();
             }
+            try //cria um registro na tabela de venda cancelada
+            {
+                var canceledSale = CopyCanceledSale(sale);
 
-            _context.Sale.Remove(sale);
-            await _context.SaveChangesAsync();
+                _context.CanceledSale.Add(canceledSale);
+                //await _context.SaveChangesAsync();
 
-            return NoContent();
+                _context.Sale.Remove(sale);
+                await _context.SaveChangesAsync();
+
+                Console.WriteLine($"Venda {sale.Id} cancelada e removida.");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
+        private CanceledSale CopyCanceledSale(Sale sale)
+        {
+            var canceledSale = new CanceledSale
+            {
+                Id = sale.Id,
+                Flight = sale.Flight,
+                Passengers = sale.Passengers,
+                Reserved = sale.Reserved,
+                Sold = sale.Sold
+            };
+            return canceledSale;
+        }
         private bool SaleExists(int id)
         {
             return (_context.Sale?.Any(e => e.Id == id)).GetValueOrDefault();

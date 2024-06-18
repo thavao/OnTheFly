@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Sale
+    public class CanceledSale
     {
         public int Id { get; set; }
         public Flight Flight { get; set; }
-        //public int FlightId { get; set; }
         public List<Passenger> Passengers { get; set; }
-        //public string CpfBuyer { get; set; }
         public bool Reserved { get; set; }
         public bool Sold { get; set; }
     }
