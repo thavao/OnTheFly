@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using OnTheFly.SalesAPI.Data;
+using Services;
 
 namespace OnTheFly.SalesAPI.Controllers
 {
@@ -90,9 +91,11 @@ namespace OnTheFly.SalesAPI.Controllers
           {
               return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
           }
-            _context.Sale.Add(sale);
-            await _context.SaveChangesAsync();
+            //_context.Sale.Add(sale);
+            //  await _context.SaveChangesAsync();
 
+            SaleService sS = new SaleService();
+            sS.Post(sale);
             return CreatedAtAction("GetSale", new { id = sale.Id }, sale);
         }
 
