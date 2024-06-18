@@ -15,26 +15,23 @@ public class MockController : ControllerBase
 
     public MockController()
     {
-        string passengersJson = System.IO.File.ReadAllText(@"Mocks/passengers.json");
-        string flightsJson = System.IO.File.ReadAllText(@"Mocks/flights.json");
-        string salesJson = System.IO.File.ReadAllText(@"Mocks/sales.json");
-
-        _passengers = JsonSerializer.Deserialize<List<Passenger>>(passengersJson);
-        _flights = JsonSerializer.Deserialize<List<Flight>>(flightsJson);
-        _sales = JsonSerializer.Deserialize<List<Sale>>(salesJson);
+        LoadData();
     }
 
 
     [HttpGet("/GetFlights")]
     public List<Flight> GetFlight()
     {
-        string flightsJson = System.IO.File.ReadAllText(@"Mocks/flights.json");
-        return JsonSerializer.Deserialize<List<Flight>>(flightsJson);
-
+        LoadData();
+        return _flights;
     }
 
     [HttpGet("/GetFlights/{id}")]
-    public Flight? GetFlight(string id) => _flights.FirstOrDefault(f => f.Id == id);
+    public Flight? GetFlight(string id)
+    {
+        LoadData();
+        return _flights.FirstOrDefault(f => f.Id == id);
+    }
 
 
 
@@ -60,8 +57,18 @@ public class MockController : ControllerBase
         var index = _flights.FindIndex(f => f.Id == id);
         _flights[index] = flight;
 
-        System.IO.File.WriteAllText("flights.json", JsonSerializer.Serialize(_flights));
+        System.IO.File.WriteAllText("Mocks/flights.json", JsonSerializer.Serialize(_flights));
     }
 
+    private void LoadData()
+    {
+        string passengersJson = System.IO.File.ReadAllText(@"Mocks/passengers.json");
+        string flightsJson = System.IO.File.ReadAllText(@"Mocks/flights.json");
+        string salesJson = System.IO.File.ReadAllText(@"Mocks/sales.json");
+
+        _passengers = JsonSerializer.Deserialize<List<Passenger>>(passengersJson);
+        _flights = JsonSerializer.Deserialize<List<Flight>>(flightsJson);
+        _sales = JsonSerializer.Deserialize<List<Sale>>(salesJson);
+    }
 
 }
