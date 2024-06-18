@@ -1,26 +1,147 @@
-﻿using Models;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
+using Models;
+using Models.Utils;
 
 namespace Repositories
 {
     public class SaleRepository
     {
+        private readonly string _conn;
 
-        public SaleRepository() { }
-
-        public List<Sale> GetSale()
+        public SaleRepository()
         {
-            throw new NotImplementedException();
+            _conn = "Data Source=127.0.0.1; Initial Catalog=DbSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
         }
 
-        public Sale GetSale(int id)
+        public async Task<List<Sale>> GetSale()
         {
-            throw new NotImplementedException();
+            var list = new List<Sale>();
+            using var connection = new SqlConnection(_conn);
+            connection.Open();
+
+            var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
+            var t2 = ApiConsume<List<Flight>>.Get($"https://localhost:7034", $"/GetFlights");
+            var t3 = connection.QueryAsync<dynamic>(Sale.GetPassengers);
+
+            await Task.WhenAll(t1, t2, t3);
+
+            var passengersList = t1.Result;
+            var flightsList = t2.Result;
+            var passengersAsDynamic = t3.Result;
+
+
+            if (passengersList == null) return null;
+
+
+            foreach (dynamic row in connection.Query<dynamic>(Sale.Get).ToList())
+            {
+                Sale sale = new()
+                {
+                    Id = row.Id,
+                    Reserved = row.Reserved,
+                    Sold = row.Sold,
+                    Passengers = new(),
+                    Flight = flightsList.FirstOrDefault(f => f.Id == row.FlightId)
+                };
+
+
+                foreach (var passengerRow in passengersAsDynamic)
+                {
+                    if (passengerRow.SaleId == sale.Id)
+                    {
+                        string cpf = passengerRow.CpfPassenger;
+                        var p = passengersList.FirstOrDefault(p => p.CPF.Equals(cpf));
+                        sale.Passengers.Add(p);
+                    }
+                }
+
+                list.Add(sale);
+            }
+            return list;
+        }
+
+
+        public async Task<Sale> GetSale(int id)
+        {
+            var list = new List<Sale>();
+            using var connection = new SqlConnection(_conn);
+            connection.Open();
+
+            dynamic? row = connection.Query<dynamic>(Sale.Get, new { Id = id }).FirstOrDefault();
+
+            if (row == null)
+                return null;
+
+            string query = "Select CpfPassenger FROM PassengerSale  WHERE SaleId = @SaleId";
+
+            var cpfs = connection.Query<string>(query, new { SaleId = id }).ToList();
+
+
+            var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
+            var t2 = ApiConsume<Flight>.Get($"https://localhost:7034", $"/GetFlights/{row.FlightId}");
+
+            await Task.WhenAll(t1, t2);
+
+            var listPassenger = t1.Result;
+            var flight = t2.Result;
+
+
+            if (listPassenger == null || flight == null)
+                return null;
+
+            listPassenger = listPassenger.Where(p => cpfs.Contains(p.CPF)).ToList();
+
+            Sale sale = new()
+            {
+                Id = row.Id,
+                Reserved = row.Reserved,
+                Sold = row.Sold,
+                Passengers = listPassenger,
+                Flight = flight
+            };
+
+
+            return sale;
         }
 
         public Sale Post(Sale sale)
         {
-            throw new NotImplementedException();
-        }
+            string strConn = "Data Source=127.0.0.1;Initial Catalog=DBSales;User Id=sa;Password=SqlServer2019!;TrustServerCertificate=Yes;";
 
+            using (var connection = new SqlConnection(strConn))
+            {
+                connection.Open();
+
+                string insertSaleQuery = @"INSERT INTO Sale (FlightId, CpfBuyer, Reserved, Sold) 
+                                           VALUES (@FlightId, @CpfBuyer, @Reserved, @Sold);
+                                           SELECT CAST(SCOPE_IDENTITY() as int)";
+
+                int saleId = connection.ExecuteScalar<int>(insertSaleQuery, new
+                {
+                    FlightId = sale.Flight.Id,
+                    CpfBuyer = sale.Passengers[0].CPF,
+                    Reserved = sale.Reserved,
+                    Sold = sale.Sold
+                });
+
+                foreach (var passenger in sale.Passengers)
+                {
+                    string insertPassengerQuery = @"INSERT INTO PassengerSale (SaleId, CpfPassenger) 
+                                                    VALUES (@SaleId, @CpfPassenger)";
+
+                    connection.Execute(insertPassengerQuery, new
+                    {
+                        SaleId = saleId,
+                        CpfPassenger = passenger.CPF
+                    });
+                }
+
+                return sale;
+
+
+            }
+
+        }
     }
 }
