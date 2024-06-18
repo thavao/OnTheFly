@@ -8,6 +8,11 @@ namespace Models
 {
     public class Sale
     {
+        public static readonly string Get = @"SELECT Id, FlightId, CpfBuyer, Reserved, Sold FROM Sale";
+
+        public static readonly string GetId = Get + " WHERE Id = @Id";
+        public static readonly string GetPassengers = "Select SaleId, CpfPassenger FROM PassengerSale";
+
         public int Id { get; set; }
         public Flight Flight { get; set; }
         public List<Passenger> Passengers { get; set; }
