@@ -110,5 +110,51 @@ namespace Repositories
             throw new NotImplementedException();
         }
 
+        public async Task<bool> SoldSale(int id)
+        {
+            using (var connection = new SqlConnection(_conn))
+            {
+                string query = "UPDATE Sale SET Reserved = 0, Sold = 1 WHERE Id = @Id";
+
+                connection.Open();
+                var rowsAffected = connection.Execute(query, id);
+                connection.Close();
+
+                if (rowsAffected > 0)
+                    return true;
+                else
+                    return false;
+
+            }
+        }
+        public async Task<bool> PutSale(Sale sale)
+        {
+            using (var connection = new SqlConnection(_conn))
+            {
+                string query = "UPDATE Sale SET " +
+                    "[FlightId] = @Flight," +
+                    "[CpfBuyer] =  @CpfBuyer," +
+                    "[Reserved] = @Reserved," +
+                    "[Sold] = @Sold " +
+                    "WHERE Id = @Id;";
+                connection.Open();
+                var rowsAffected = await connection.ExecuteAsync(query, new
+                {
+                    Flight = sale.Flight.Id,
+                    CpfBuyer = sale.Passengers[0].CPF,
+                    sale.Reserved,
+                    sale.Sold,
+                    sale.Id,
+                });
+                connection.Close();
+
+                if (rowsAffected > 0)
+                    return true;
+                else
+                    return false;
+
+            }
+
+        }
     }
 }
