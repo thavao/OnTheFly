@@ -68,24 +68,22 @@ namespace Repositories
             using var connection = new SqlConnection(_conn);
             connection.Open();
 
-            dynamic? row = connection.Query<dynamic>(Sale.Get, new { Id = id }).FirstOrDefault();
-
+            dynamic? row = connection.Query<dynamic>(Sale.GetId, new { Id = id }).FirstOrDefault();
+            
             if (row == null)
                 return null;
 
             string query = "Select CpfPassenger FROM PassengerSale  WHERE SaleId = @SaleId";
-
-            var cpfs = connection.Query<string>(query, new { SaleId = id }).ToList();
-
-
             var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
-            var t2 = ApiConsume<Flight>.Get($"https://localhost:7034", $"/GetFlights/{row.FlightId}");
 
-            await Task.WhenAll(t1, t2);
+            var t2 = ApiConsume<Flight>.Get($"https://localhost:7034", $"/GetFlights/{row.FlightId}");
+            var t3 = connection.QueryAsync<string>(query, new { SaleId = id });
+
+            await Task.WhenAll(t1, t2, t3);
 
             var listPassenger = t1.Result;
             var flight = t2.Result;
-
+            var cpfs = t3.Result;
 
             if (listPassenger == null || flight == null)
                 return null;
@@ -100,7 +98,6 @@ namespace Repositories
                 Passengers = listPassenger,
                 Flight = flight
             };
-
 
             return sale;
         }
