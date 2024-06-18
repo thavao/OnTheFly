@@ -27,7 +27,7 @@ public class MockController : ControllerBase
     }
 
     [HttpGet("/GetFlights/{id}")]
-    public Flight? GetFlight(string id)
+    public Flight? GetFlight(int id)
     {
         LoadData();
         return _flights.FirstOrDefault(f => f.Id == id);
@@ -52,7 +52,7 @@ public class MockController : ControllerBase
 
 
     [HttpPut("/UpdateFlight/{id}")]
-    public void UpdateFlight(string id, [FromBody] Flight flight)
+    public void UpdateFlight(int id, [FromBody] Flight flight)
     {
         var index = _flights.FindIndex(f => f.Id == id);
         _flights[index] = flight;

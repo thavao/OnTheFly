@@ -12,14 +12,14 @@ namespace Services
             _saleRepository = new();
         }
 
-        public List<Sale> GetSale()
+        public async Task<List<Sale>> GetSale()
         {
-            return _saleRepository.GetSale();
+            return await _saleRepository.GetSale();
         }
 
-        public Sale GetSale(int id)
+        public async Task<Sale> GetSale(int id)
         {
-            return _saleRepository.GetSale(id);
+            return await _saleRepository.GetSale(id);
         }
 
         public Sale Post(Sale sale)
