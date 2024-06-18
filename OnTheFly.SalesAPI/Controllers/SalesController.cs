@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using OnTheFly.SalesAPI.Data;
+using Services;
 
 namespace OnTheFly.SalesAPI.Controllers
 {
@@ -15,39 +16,29 @@ namespace OnTheFly.SalesAPI.Controllers
     public class SalesController : ControllerBase
     {
         private readonly OnTheFlySalesAPIContext _context;
+        private readonly SaleService _saleService;
 
         public SalesController(OnTheFlySalesAPIContext context)
         {
             _context = context;
+            _saleService = new();
         }
 
-        // GET: api/Sales
-        [HttpGet]
+
+        [HttpGet] // GET: api/Sales
         public async Task<ActionResult<IEnumerable<Sale>>> GetSale()
         {
-          if (_context.Sale == null)
-          {
-              return NotFound();
-          }
-            return await _context.Sale.ToListAsync();
+            var sales = await _saleService.GetSale();
+            return sales == null ? NotFound("Can't find sales") : Ok(sales);
         }
 
-        // GET: api/Sales/5
-        [HttpGet("{id}")]
+
+        [HttpGet("{id}")] // GET: api/Sales/5
         public async Task<ActionResult<Sale>> GetSale(int id)
         {
-          if (_context.Sale == null)
-          {
-              return NotFound();
-          }
-            var sale = await _context.Sale.FindAsync(id);
+            var sale = await _saleService.GetSale(id);
 
-            if (sale == null)
-            {
-                return NotFound();
-            }
-
-            return sale;
+            return sale == null ? NotFound("Can't find sale with id " + id) : Ok(sale);
         }
 
         // PUT: api/Sales/5
@@ -86,10 +77,10 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Sale>> PostSale(Sale sale)
         {
-          if (_context.Sale == null)
-          {
-              return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
-          }
+            if (_context.Sale == null)
+            {
+                return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
+            }
             _context.Sale.Add(sale);
             await _context.SaveChangesAsync();
 

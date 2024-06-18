@@ -2,7 +2,7 @@
   {
     "Id": 1,
     "Flight": {
-      "Id": "1",
+      "Id": 1,
       "Sales": 5,
       "Status": true
     },
@@ -26,7 +26,7 @@
   {
     "Id": 2,
     "Flight": {
-      "Id": "2",
+      "Id": 2,
       "Sales": 10,
       "Status": true
     },
@@ -50,7 +50,7 @@
   {
     "Id": 3,
     "Flight": {
-      "Id": "3",
+      "Id": 3,
       "Sales": 5,
       "Status": true
     },
@@ -74,7 +74,7 @@
   {
     "Id": 4,
     "Flight": {
-      "Id": "4",
+      "Id": 4,
       "Sales": 8,
       "Status": true
     },
@@ -98,7 +98,7 @@
   {
     "Id": 5,
     "Flight": {
-      "Id": "5",
+      "Id": 5,
       "Sales": 10,
       "Status": true
     },
