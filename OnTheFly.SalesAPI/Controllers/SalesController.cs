@@ -89,18 +89,8 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpDelete("{id}")]
         public void RemoveSale(int id)
         {
-            new SaleRepository().RemoveSale(id);           
+            new SaleService().RemoveSale(id);
         }
-                return NotFound();
-            }
-            var sale = await _context.Sale.FindAsync(id);
-            if (sale == null)
-            {
-                return NotFound();
-            }
 
-
-
+    }
 }
-
-

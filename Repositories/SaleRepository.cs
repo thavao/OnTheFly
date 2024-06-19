@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Models;
 using Models.Utils;
+using System.Reflection.Metadata;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Repositories
@@ -145,31 +146,58 @@ namespace Repositories
             using (var connection = new SqlConnection(_conn))
             {
                 connection.Open();
+
                 var sale = GetSale(Id).Result;
                 if (sale == null)
                 {
-                    Console.WriteLine("Venda não localizada.");
+                    Console.WriteLine("Venda não encontrada.");
                     return null;
                 }
-               
+                if (sale.Reserved == false & sale.Sold == false)
+                {
+                    Console.WriteLine("Venda cancelada.");
+                    return null;
+                }
+                if (sale.Sold == true)
+                {
+                    Console.WriteLine("Venda não pode ser cancelada.");
+                    return null;
+                }
                 try //cria um registro na tabela de venda cancelada
                 {
+                    sale.Reserved = false;
+                    sale.Sold = false;
+
                     string insertCanceledSaleQuery = @"INSERT INTO CanceledSale (Id, FlightId, CpfBuyer, Reserved, Sold) 
                                                     VALUES (@Id, @FlightId, @CpfBuyer, @Reserved, @Sold)";
                     connection.Execute(insertCanceledSaleQuery, new
                     {
                         Id = sale.Id,
-                        FlightId = sale.Flight,
+                        FlightId = sale.Flight.Id,
                         CpfBuyer = sale.Passengers[0].CPF,
                         Reserved = sale.Reserved,
                         Sold = sale.Sold
                     });
-
-                    string deleteSaleQuery = "DELETE FROM Sale WHERE Id = @Id";
-                    connection.Execute(deleteSaleQuery, new { Id = Id });
-
+    
+                    string updateSale = "UPDATE Sale SET Reserved = 0, Sold = 0 WHERE Id = @Id";
+                   connection.Execute(updateSale, new
+                    {
+                        Id = sale.Id,
+                        FlightId = sale.Flight.Id,
+                        CpfBuyer = sale.Passengers[0].CPF,
+                        Reserved = sale.Reserved,
+                        Sold = sale.Sold
+                    });
+                
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erro ao cancelar a venda: " + ex.Message);
+                }
+                return sale;
             }
         }
+
         public async Task<bool> SoldSale(int id)
         {
             using (var connection = new SqlConnection(_conn))
@@ -216,7 +244,7 @@ namespace Repositories
             }
 
         }
-    } 
+    }
 }
 
 

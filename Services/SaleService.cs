@@ -150,5 +150,10 @@ namespace Services
             return _saleRepository.SoldSale(id);
         }
 
+        public void RemoveSale(int id)
+        {
+            new SaleRepository().RemoveSale(id);
+        }
+
     }
 }
