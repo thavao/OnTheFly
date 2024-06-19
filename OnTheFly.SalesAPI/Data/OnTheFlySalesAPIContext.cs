@@ -17,4 +17,6 @@ namespace OnTheFly.SalesAPI.Data
         public DbSet<Models.Sale> Sale { get; set; } = default!;
 
     }
+
 }
+

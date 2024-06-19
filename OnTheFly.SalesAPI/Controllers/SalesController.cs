@@ -64,16 +64,29 @@ namespace OnTheFly.SalesAPI.Controllers
                 if (result)
                     return Ok();
 
-                return Problem("Unable to update sale");
+                return NoContent();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                return Problem();
             }
-
-
-
         }
+        // POST: api/Sales
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Sale>> PostSale(Sale sale)
+        {
+            SaleService sS = new SaleService();
+            sS.Post(sale);
+
+            return CreatedAtAction("GetSale", new { id = sale.Id }, sale);
+        }
+
+
     }
+
+
+
 }
+
+
