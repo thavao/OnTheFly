@@ -9,10 +9,15 @@ namespace Repositories
     public class SaleRepository
     {
         private readonly string _conn;
+        private readonly string _passengerUri;
+        private readonly string _flightUri;
 
         public SaleRepository()
         {
-            _conn = "Data Source=127.0.0.1; Initial Catalog=DBSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
+            _conn = "Data Source=127.0.0.1; Initial Catalog=DbSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
+
+            _passengerUri = "https://localhost:7034";
+            _flightUri = "https://localhost:7034";
         }
 
         public async Task<List<Sale>> GetSale()
@@ -21,8 +26,8 @@ namespace Repositories
             using var connection = new SqlConnection(_conn);
             connection.Open();
 
-            var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
-            var t2 = ApiConsume<List<Flight>>.Get($"https://localhost:7034", $"/GetFlights");
+            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/GetPassengers");
+            var t2 = ApiConsume<List<Flight>>.Get(_flightUri, "/GetFlights");
             var t3 = connection.QueryAsync<dynamic>(Sale.GetPassengers);
 
             await Task.WhenAll(t1, t2, t3);
@@ -32,8 +37,8 @@ namespace Repositories
             var passengersAsDynamic = t3.Result;
 
 
-            if (passengersList == null) return null;
-
+            if (passengersList == null)
+                return null;
 
             foreach (dynamic row in connection.Query<dynamic>(Sale.Get).ToList())
             {
@@ -69,24 +74,20 @@ namespace Repositories
             using var connection = new SqlConnection(_conn);
             connection.Open();
 
-            dynamic? row = connection.Query<dynamic>(Sale.Get, new { Id = id }).FirstOrDefault();
+            dynamic? row = connection.Query<dynamic>(Sale.GetId, new { Id = id }).FirstOrDefault();
 
             if (row == null)
                 return null;
 
-            string query = "Select CpfPassenger FROM PassengerSale  WHERE SaleId = @SaleId";
+            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/GetPassengers");
+            var t2 = ApiConsume<Flight>.Get(_flightUri, $"/GetFlights/{row.FlightId}");
+            var t3 = connection.QueryAsync<string>(Sale.GetPassengersById, new { SaleId = id });
 
-            var cpfs = connection.Query<string>(query, new { SaleId = id }).ToList();
-
-
-            var t1 = ApiConsume<List<Passenger>>.Get($"https://localhost:7034", $"/GetPassengers");
-            var t2 = ApiConsume<Flight>.Get($"https://localhost:7034", $"/GetFlights/{row.FlightId}");
-
-            await Task.WhenAll(t1, t2);
+            await Task.WhenAll(t1, t2, t3);
 
             var listPassenger = t1.Result;
             var flight = t2.Result;
-
+            var cpfs = t3.Result;
 
             if (listPassenger == null || flight == null)
                 return null;
@@ -101,7 +102,6 @@ namespace Repositories
                 Passengers = listPassenger,
                 Flight = flight
             };
-
 
             return sale;
         }
@@ -168,15 +168,53 @@ namespace Repositories
                     string deleteSaleQuery = "DELETE FROM Sale WHERE Id = @Id";
                     connection.Execute(deleteSaleQuery, new { Id = Id });
 
-                    Console.WriteLine($"Venda {sale.Id} cancelada e removida.");
-                    return sale;
-                }
-                catch (Exception ex)
+            }
+        }
+        public async Task<bool> SoldSale(int id)
+        {
+            using (var connection = new SqlConnection(_conn))
+            {
+                string query = "UPDATE Sale SET Reserved = 0, Sold = 1 WHERE Id = @Id";
+
+                connection.Open();
+                var rowsAffected = connection.Execute(query, new { Id = id });
+                connection.Close();
+
+                if (rowsAffected > 0)
+                    return true;
+                else
+                    return false;
+
+            }
+        }
+        public async Task<bool> PutSale(Sale sale)
+        {
+            using (var connection = new SqlConnection(_conn))
+            {
+                string query = "UPDATE Sale SET " +
+                    "[FlightId] = @Flight," +
+                    "[CpfBuyer] =  @CpfBuyer," +
+                    "[Reserved] = @Reserved," +
+                    "[Sold] = @Sold " +
+                    "WHERE Id = @Id;";
+                connection.Open();
+                var rowsAffected = await connection.ExecuteAsync(query, new
                 {
-                    return null;
-                }
-            }        
-            return null;
+                    Flight = sale.Flight.Id,
+                    CpfBuyer = sale.Passengers[0].CPF,
+                    sale.Reserved,
+                    sale.Sold,
+                    sale.Id,
+                });
+                connection.Close();
+
+                if (rowsAffected > 0)
+                    return true;
+                else
+                    return false;
+
+            }
+
         }
     } 
 }

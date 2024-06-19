@@ -16,12 +16,10 @@ namespace OnTheFly.SalesAPI.Controllers
     [ApiController]
     public class SalesController : ControllerBase
     {
-        private readonly OnTheFlySalesAPIContext _context;
         private readonly SaleService _saleService;
 
-        public SalesController(OnTheFlySalesAPIContext context)
+        public SalesController()
         {
-            _context = context;
             _saleService = new();
         }
 
@@ -42,6 +40,17 @@ namespace OnTheFly.SalesAPI.Controllers
             return sale == null ? NotFound("Can't find sale with id " + id) : Ok(sale);
         }
 
+        [HttpPatch("Sold/{id}")]
+        public async Task<ActionResult> SoldSale(int id)
+        {
+            bool isSold = await _saleService.SoldSale(id);
+
+            if (isSold)
+                return Ok();
+
+            return Problem("Unable to complete sale");
+
+        }
         // PUT: api/Sales/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -52,39 +61,24 @@ namespace OnTheFly.SalesAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(sale).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var result = await _saleService.Put(sale);
+                if (result)
+                    return Ok();
+
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!SaleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Problem();
             }
-
-            return NoContent();
         }
-
         // POST: api/Sales
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Sale>> PostSale(Sale sale)
         {
-          if (_context.Sale == null)
-          {
-              return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
-          }
-            //_context.Sale.Add(sale);
-            //  await _context.SaveChangesAsync();
-
             SaleService sS = new SaleService();
             sS.Post(sale);
 
@@ -97,22 +91,16 @@ namespace OnTheFly.SalesAPI.Controllers
         {
             new SaleRepository().RemoveSale(id);           
         }
+                return NotFound();
+            }
+            var sale = await _context.Sale.FindAsync(id);
+            if (sale == null)
+            {
+                return NotFound();
+            }
 
-        //private CanceledSale CopyCanceledSale(Sale sale)
-        //{
-        //    var canceledSale = new CanceledSale
-        //    {
-        //        Id = sale.Id,
-        //        Flight = sale.Flight,
-        //        Passengers = sale.Passengers,
-        //        Reserved = sale.Reserved,
-        //        Sold = sale.Sold
-        //    };
-        //    return canceledSale;
-        //}
-        private bool SaleExists(int id)
-        {
-            return (_context.Sale?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-    }
+
+
 }
+
+
