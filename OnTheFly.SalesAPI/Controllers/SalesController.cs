@@ -39,12 +39,14 @@ namespace OnTheFly.SalesAPI.Controllers
             return sale == null ? NotFound("Can't find sale with id " + id) : Ok(sale);
         }
 
-        [HttpPatch("/Sold/{id}")]
+        [HttpPatch("Sold/{id}")]
         public async Task<ActionResult> SoldSale(int id)
         {
             bool isSold = await _saleService.SoldSale(id);
+
             if (isSold)
                 return Ok();
+
             return Problem("Unable to complete sale");
 
         }
