@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Mvc;
 using Models;
+using Newtonsoft.Json;
+using RabbitMQ.Client;
 using Services;
+using System.Text;
 
 namespace OnTheFly.SalesAPI.Controllers
 {
@@ -9,10 +13,13 @@ namespace OnTheFly.SalesAPI.Controllers
     public class SalesController : ControllerBase
     {
         private readonly SaleService _saleService;
+        private readonly ConnectionFactory _factory;
+        private const string QUEUE_NAME = "salesReservation";
 
-        public SalesController()
+        public SalesController(ConnectionFactory factory)
         {
             _saleService = new();
+            _factory = factory;
         }
 
 
@@ -55,9 +62,30 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Sale>> PostSale(Sale sale)
         {
-            _saleService.Post(sale);
+            using var connection = _factory.CreateConnection();
+            using var channel = connection.CreateModel();
 
-            return CreatedAtAction("GetSale", new { id = sale.Id }, sale);
+            // Declare the queue
+            channel.QueueDeclare(
+                queue: QUEUE_NAME,
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null
+                );
+
+            string saleAsStr = JsonConvert.SerializeObject(sale);
+            var saleAsBytes = Encoding.UTF8.GetBytes(saleAsStr);
+
+
+            channel.BasicPublish(
+                exchange: "",
+                routingKey: QUEUE_NAME,
+                basicProperties: null,
+                body: saleAsBytes
+                );
+
+            return Accepted();
         }
 
         // DELETE: api/Sales/5
