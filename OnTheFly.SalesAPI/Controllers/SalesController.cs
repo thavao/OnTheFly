@@ -86,8 +86,7 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Sale>> PostSale(Sale sale)
         {
-            SaleService sS = new SaleService();
-            sS.Post(sale);
+            _saleService.Post(sale);
 
             return CreatedAtAction("GetSale", new { id = sale.Id }, sale);
         }
