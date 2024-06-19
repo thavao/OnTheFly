@@ -10,12 +10,11 @@ namespace OnTheFly.SalesAPI.Data
     public class OnTheFlySalesAPIContext : DbContext
     {
         public OnTheFlySalesAPIContext(DbContextOptions<OnTheFlySalesAPIContext> options)
-            : base(options)
+           : base(options)
         {
         }
-
         public DbSet<Models.Sale> Sale { get; set; } = default!;
-
+        public DbSet<CanceledSale> CanceledSale { get; set; }
     }
 
 }

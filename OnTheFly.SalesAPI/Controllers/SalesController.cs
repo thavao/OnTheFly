@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using OnTheFly.SalesAPI.Data;
+using Repositories;
 using Services;
 
 namespace OnTheFly.SalesAPI.Controllers
@@ -84,8 +85,19 @@ namespace OnTheFly.SalesAPI.Controllers
             return CreatedAtAction("GetSale", new { id = sale.Id }, sale);
         }
 
-
-    }
+        // DELETE: api/Sales/5
+        [HttpDelete("{id}")]
+        public void RemoveSale(int id)
+        {
+            new SaleRepository().RemoveSale(id);           
+        }
+                return NotFound();
+            }
+            var sale = await _context.Sale.FindAsync(id);
+            if (sale == null)
+            {
+                return NotFound();
+            }
 
 
 
