@@ -45,7 +45,7 @@ namespace OnTheFly.SalesAPI.Controllers
         {
             try
             {
-                using (var conn = _factroy.CreateConnection())
+                using (var conn = _factory.CreateConnection())
                 {
                     using (var channel = conn.CreateModel())
                     {
