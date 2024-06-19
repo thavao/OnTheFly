@@ -42,12 +42,19 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpPatch("Sold/{id}")]
         public async Task<ActionResult> SoldSale(int id)
         {
-            bool isSold = await _saleService.SoldSale(id);
+            try
+            {
+                bool isSold = await _saleService.SoldSale(id);
 
-            if (isSold)
-                return Ok();
+                if (isSold)
+                    return NoContent();
 
-            return Problem("Unable to complete sale");
+                return Problem("Unable to complete sale");
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
 
         }
         // PUT: api/Sales/5
