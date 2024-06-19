@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using OnTheFly.SalesAPI.Data;
+using Repositories;
 using Services;
 
 namespace OnTheFly.SalesAPI.Controllers
@@ -92,45 +93,23 @@ namespace OnTheFly.SalesAPI.Controllers
 
         // DELETE: api/Sales/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveSale(int id)
+        public void RemoveSale(int id)
         {
-            var sale = await _context.Sale.FindAsync(id);
-            if (sale == null)
-            {
-                Console.WriteLine("Venda não localizada.");
-                return NotFound();
-            }
-            try //cria um registro na tabela de venda cancelada
-            {
-                var canceledSale = CopyCanceledSale(sale);
-
-                _context.CanceledSale.Add(canceledSale);
-                //await _context.SaveChangesAsync();
-
-                _context.Sale.Remove(sale);
-                await _context.SaveChangesAsync();
-
-                Console.WriteLine($"Venda {sale.Id} cancelada e removida.");
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            new SaleRepository().RemoveSale(id);           
         }
 
-        private CanceledSale CopyCanceledSale(Sale sale)
-        {
-            var canceledSale = new CanceledSale
-            {
-                Id = sale.Id,
-                Flight = sale.Flight,
-                Passengers = sale.Passengers,
-                Reserved = sale.Reserved,
-                Sold = sale.Sold
-            };
-            return canceledSale;
-        }
+        //private CanceledSale CopyCanceledSale(Sale sale)
+        //{
+        //    var canceledSale = new CanceledSale
+        //    {
+        //        Id = sale.Id,
+        //        Flight = sale.Flight,
+        //        Passengers = sale.Passengers,
+        //        Reserved = sale.Reserved,
+        //        Sold = sale.Sold
+        //    };
+        //    return canceledSale;
+        //}
         private bool SaleExists(int id)
         {
             return (_context.Sale?.Any(e => e.Id == id)).GetValueOrDefault();

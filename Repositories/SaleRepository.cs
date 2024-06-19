@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Models;
 using Models.Utils;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Repositories
 {
@@ -11,7 +12,7 @@ namespace Repositories
 
         public SaleRepository()
         {
-            _conn = "Data Source=127.0.0.1; Initial Catalog=DbSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
+            _conn = "Data Source=127.0.0.1; Initial Catalog=DBSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
         }
 
         public async Task<List<Sale>> GetSale()
@@ -136,12 +137,51 @@ namespace Repositories
                         CpfPassenger = passenger.CPF
                     });
                 }
-
                 return sale;
-
-
             }
-
         }
-    }
+        public Sale RemoveSale(int Id)
+        {
+            using (var connection = new SqlConnection(_conn))
+            {
+                connection.Open();
+                var sale = GetSale(Id).Result;
+                if (sale == null)
+                {
+                    Console.WriteLine("Venda não localizada.");
+                    return null;
+                }
+               
+                try //cria um registro na tabela de venda cancelada
+                {
+                    string insertCanceledSaleQuery = @"INSERT INTO CanceledSale (Id, FlightId, CpfBuyer, Reserved, Sold) 
+                                                    VALUES (@Id, @FlightId, @CpfBuyer, @Reserved, @Sold)";
+                    connection.Execute(insertCanceledSaleQuery, new
+                    {
+                        Id = sale.Id,
+                        FlightId = sale.Flight,
+                        CpfBuyer = sale.Passengers[0].CPF,
+                        Reserved = sale.Reserved,
+                        Sold = sale.Sold
+                    });
+
+                    string deleteSaleQuery = "DELETE FROM Sale WHERE Id = @Id";
+                    connection.Execute(deleteSaleQuery, new { Id = Id });
+
+                    Console.WriteLine($"Venda {sale.Id} cancelada e removida.");
+                    return sale;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }        
+            return null;
+        }
+    } 
 }
+
+
+
+
+
