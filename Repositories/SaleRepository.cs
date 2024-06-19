@@ -2,8 +2,6 @@
 using Microsoft.Data.SqlClient;
 using Models;
 using Models.Utils;
-using System.Reflection.Metadata;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Repositories
 {
@@ -178,9 +176,9 @@ namespace Repositories
                         Reserved = sale.Reserved,
                         Sold = sale.Sold
                     });
-    
+
                     string updateSale = "UPDATE Sale SET Reserved = 0, Sold = 0 WHERE Id = @Id";
-                   connection.Execute(updateSale, new
+                    connection.Execute(updateSale, new
                     {
                         Id = sale.Id,
                         FlightId = sale.Flight.Id,
@@ -188,7 +186,7 @@ namespace Repositories
                         Reserved = sale.Reserved,
                         Sold = sale.Sold
                     });
-                
+
                 }
                 catch (Exception ex)
                 {
