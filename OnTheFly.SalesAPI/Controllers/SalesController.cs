@@ -89,7 +89,7 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpDelete("{id}")]
         public void RemoveSale(int id)
         {
-            new SaleService().RemoveSale(id);
+            _saleService.RemoveSale(id);
         }
 
     }
