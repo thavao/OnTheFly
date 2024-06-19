@@ -28,12 +28,33 @@ namespace Services
 
         public Sale Post(Sale sale)
         {
-            if (ValidCPF(sale.Passengers) && validFlight(sale.Flight) && validCount(sale.Flight.Id, sale.Passengers.Count) )
+            if (ValidCPF(sale.Passengers) && NotDuplicateCPF(sale)&& validFlight(sale.Flight) && validCount(sale.Flight.Id, sale.Passengers.Count))
             {
                 return _saleRepository.Post(sale);
 
             } 
             return null;
+        }
+
+        private bool NotDuplicateCPF(Sale sale)
+        {
+            HashSet<string> cpfLists = new HashSet<string>();
+
+            var ListSale = _saleRepository.GetSale().Result;
+
+
+            var filteredSales = ListSale.Where(s => s.Flight.Id == sale.Flight.Id).ToList();
+
+
+            foreach (var passenger in sale.Passengers.Concat(filteredSales.SelectMany(s => s.Passengers)))
+            {
+                if (!cpfLists.Add(passenger.CPF))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool validCount(int id, int count)
@@ -112,6 +133,7 @@ namespace Services
             var listPassengers = ApiConsume<List<Passenger>>.Get(baseUri, requestUri).Result;
 
             var firstPassenger = passengers.FirstOrDefault();
+
             if (firstPassenger != null)
             {
                 var idade = DateTime.Today.Year - firstPassenger.DtBirth.Year;

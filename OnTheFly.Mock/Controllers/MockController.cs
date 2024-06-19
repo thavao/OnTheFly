@@ -64,11 +64,11 @@ public class MockController : ControllerBase
     {
         string passengersJson = System.IO.File.ReadAllText(@"Mocks/passengers.json");
         string flightsJson = System.IO.File.ReadAllText(@"Mocks/flights.json");
-        string salesJson = System.IO.File.ReadAllText(@"Mocks/sales.json");
+   //     string salesJson = System.IO.File.ReadAllText(@"Mocks/sales.json");
 
         _passengers = JsonSerializer.Deserialize<List<Passenger>>(passengersJson);
         _flights = JsonSerializer.Deserialize<List<Flight>>(flightsJson);
-        _sales = JsonSerializer.Deserialize<List<Sale>>(salesJson);
+   //     _sales = JsonSerializer.Deserialize<List<Sale>>(salesJson);
     }
 
 }

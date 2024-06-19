@@ -81,8 +81,6 @@ namespace OnTheFly.SalesAPI.Controllers
           {
               return Problem("Entity set 'OnTheFlySalesAPIContext.Sale'  is null.");
           }
-            //_context.Sale.Add(sale);
-            //  await _context.SaveChangesAsync();
 
             SaleService sS = new SaleService();
             sS.Post(sale);
