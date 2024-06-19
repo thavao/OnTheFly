@@ -202,17 +202,31 @@ namespace Repositories
         {
             using (var connection = new SqlConnection(_conn))
             {
-                string query = "UPDATE Sale SET Reserved = 0, Sold = 1 WHERE Id = @Id";
+                try
+                {
+                    var sale = GetSale(id).Result;
 
-                connection.Open();
-                var rowsAffected = connection.Execute(query, new { Id = id });
-                connection.Close();
+                    if (sale == null)
+                        return false;
 
-                if (rowsAffected > 0)
-                    return true;
-                else
+                    if (sale.Sold)
+                        return false;
+
+                    string query = "UPDATE Sale SET Reserved = 0, Sold = 1 WHERE Id = @Id";
+
+                    connection.Open();
+                    var rowsAffected = connection.Execute(query, new { Id = id });
+                    connection.Close();
+
+                    if (rowsAffected > 0)
+                        return true;
+                    else
+                        return false;
+                }
+                catch (Exception ex)
+                {
                     return false;
-
+                }
             }
         }
         public async Task<bool> PutSale(Sale sale)
