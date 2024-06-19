@@ -50,29 +50,6 @@ namespace OnTheFly.SalesAPI.Controllers
             }
 
         }
-        // PUT: api/Sales/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSale(int id, Sale sale)
-        {
-            if (id != sale.Id)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var result = await _saleService.Put(sale);
-                if (result)
-                    return Ok();
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return Problem();
-            }
-        }
         // POST: api/Sales
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

@@ -162,10 +162,6 @@ namespace Services
             return true;
         }
 
-        public Task<bool> Put(Sale sale)
-        {
-            return _saleRepository.PutSale(sale);
-        }
         public Task<bool> SoldSale(int id)
         {
             return _saleRepository.SoldSale(id);
