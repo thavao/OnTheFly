@@ -9,7 +9,11 @@ builder.Services.AddDbContext<OnTheFlySalesAPIContext>(options =>
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+// Register the ConnectionFactory as a singleton
 builder.Services.AddSingleton<ConnectionFactory>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
