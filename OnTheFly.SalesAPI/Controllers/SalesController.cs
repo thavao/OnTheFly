@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Mvc;
 using Models;
+using Newtonsoft.Json;
+using RabbitMQ.Client;
 using Services;
+using System.Text;
 
 namespace OnTheFly.SalesAPI.Controllers
 {
@@ -9,10 +13,13 @@ namespace OnTheFly.SalesAPI.Controllers
     public class SalesController : ControllerBase
     {
         private readonly SaleService _saleService;
+        private readonly ConnectionFactory _factroy;
+        private const string QUEUE_SOLD = "sold";
 
-        public SalesController()
+        public SalesController(ConnectionFactory factory)
         {
             _saleService = new();
+            _factroy = factory;
         }
 
 
@@ -37,12 +44,28 @@ namespace OnTheFly.SalesAPI.Controllers
         {
             try
             {
-                bool isSold = await _saleService.SoldSale(id);
+                using (var conn = _factroy.CreateConnection())
+                {
+                    using (var channel = conn.CreateModel())
+                    {
+                        channel.QueueDeclare(
+                            queue: QUEUE_SOLD,
+                            durable: false,
+                            exclusive: false,
+                            autoDelete: false);
 
-                if (isSold)
-                    return NoContent();
+                        var stringId = JsonConvert.SerializeObject(id);
+                        var bytesId = Encoding.UTF8.GetBytes(stringId);
 
-                return Problem("Unable to complete sale");
+                        channel.BasicPublish(
+                            exchange: "",
+                            routingKey: QUEUE_SOLD,
+                            basicProperties: null,
+                            body: bytesId
+                            );
+                    };
+                }
+                return Accepted();
             }
             catch (Exception ex)
             {
