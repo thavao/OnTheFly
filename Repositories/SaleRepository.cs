@@ -149,7 +149,7 @@ namespace Repositories
                 string query = "UPDATE Sale SET Reserved = 0, Sold = 1 WHERE Id = @Id";
 
                 connection.Open();
-                var rowsAffected = connection.Execute(query, id);
+                var rowsAffected = connection.Execute(query, new { Id = id });
                 connection.Close();
 
                 if (rowsAffected > 0)
