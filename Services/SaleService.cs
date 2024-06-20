@@ -43,12 +43,12 @@ namespace Services
 
         private List<Passenger> returnPassagers(List<string> passengers)
         {
-            string baseUri = "https://localhost:7034/";
+            string baseUri = "https://localhost:7298/";
             List<Passenger> passagersList = new List<Passenger>();
 
             foreach (var passenger in passengers)
             {
-                string requestUri = $"GetPassengers/{passenger}";
+                string requestUri = $"/api/Passengers/{passenger}/";
                 var p = ApiConsume<Passenger>.Get(baseUri, requestUri).Result;
 
                 passagersList.Add(p);
@@ -157,8 +157,8 @@ namespace Services
 
         public bool ValidCPF(List<Passenger> passengers)
         {
-            string baseUri = "https://localhost:7034/";
-            string requestUri = $"GetPassengers";
+            string baseUri = "https://localhost:7298";
+            string requestUri = $"/api/Passengers";
 
             var listPassengers = ApiConsume<List<Passenger>>.Get(baseUri, requestUri).Result;
 
@@ -183,7 +183,7 @@ namespace Services
 
             foreach (var passenger in passengers)
             {
-                if (!listPassengers.Any(p => p.CPF == passenger.CPF) ||passenger.Status == false)
+                if (!listPassengers.Any(p => p.CPF == passenger.CPF) || passenger.Status == true)
                 {
                     return false;
                 }

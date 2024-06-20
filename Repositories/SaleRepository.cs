@@ -15,7 +15,7 @@ namespace Repositories
         {
             _conn = "Data Source=127.0.0.1; Initial Catalog=DbSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
 
-            _passengerUri = "https://localhost:7034";
+            _passengerUri = "https://localhost:7298";
             _flightUri = "https://localhost:7034";
         }
 
@@ -25,7 +25,7 @@ namespace Repositories
             using var connection = new SqlConnection(_conn);
             connection.Open();
 
-            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/GetPassengers");
+            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/api/Passengers");
             var t2 = ApiConsume<List<Flight>>.Get(_flightUri, "/GetFlights");
             var t3 = connection.QueryAsync<dynamic>(Sale.GetPassengers);
 
@@ -78,7 +78,7 @@ namespace Repositories
             if (row == null)
                 return null;
 
-            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/GetPassengers");
+            var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/api/Passengers");
             var t2 = ApiConsume<Flight>.Get(_flightUri, $"/GetFlights/{row.FlightId}");
             var t3 = connection.QueryAsync<string>(Sale.GetPassengersById, new { SaleId = id });
 
@@ -144,6 +144,7 @@ namespace Repositories
                 connection.Open();
 
                 var sale = GetSale(Id).Result;
+                
                 if (sale == null)
                 {
                     Console.WriteLine("Venda não encontrada.");
