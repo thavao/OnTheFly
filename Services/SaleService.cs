@@ -183,7 +183,7 @@ namespace Services
 
             foreach (var passenger in passengers)
             {
-                if (!listPassengers.Any(p => p.CPF == passenger.CPF))
+                if (!listPassengers.Any(p => p.CPF == passenger.CPF) ||passenger.Status == false)
                 {
                     return false;
                 }
