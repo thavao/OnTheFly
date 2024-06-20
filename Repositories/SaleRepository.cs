@@ -144,7 +144,7 @@ namespace Repositories
                 connection.Open();
 
                 var sale = GetSale(Id).Result;
-                
+
                 if (sale == null)
                 {
                     Console.WriteLine("Venda não encontrada.");
@@ -186,6 +186,8 @@ namespace Repositories
                         Sold = sale.Sold
                     });
 
+                    UpdateFlight(sale.Flight.Id, sale.Passengers.Count, "Cancel");
+
                 }
                 catch (Exception ex)
                 {
@@ -224,6 +226,29 @@ namespace Repositories
                 {
                     return false;
                 }
+            }
+        }
+
+        public async Task UpdateFlight(int flightId, int count, string operation)
+        {
+            string baseUri = "https://localhost:7034/";
+            string requestUri = $"CheckSeats/{flightId}/{operation}/{count}";
+            try
+            {
+                using HttpClient httpClient = new HttpClient();
+                HttpResponseMessage response = await httpClient.PatchAsync(baseUri + requestUri, null);
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Atualização do voo bem-sucedida!");
+                }
+                else
+                {
+                    Console.WriteLine($"Erro ao atualizar o voo. Código de status: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao atualizar o voo: {ex.Message}");
             }
         }
 

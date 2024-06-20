@@ -44,17 +44,17 @@ namespace Services
         private List<Passenger> returnPassagers(List<string> passengers)
         {
             string baseUri = "https://localhost:7298/";
-            List<Passenger> passagersList = new List<Passenger>();
+            List<Passenger> passengersList = new List<Passenger>();
 
             foreach (var passenger in passengers)
             {
                 string requestUri = $"/api/Passengers/{passenger}/";
                 var p = ApiConsume<Passenger>.Get(baseUri, requestUri).Result;
 
-                passagersList.Add(p);
+                passengersList.Add(p);
             }
 
-            return passagersList;
+            return passengersList;
 
         }
 
@@ -99,44 +99,11 @@ namespace Services
                 return false;
             }
 
-            UpdateFlight(flightGet, count);
+            _saleRepository.UpdateFlight(flightGet.Id, count, "Sell");
             return true;
         }
 
-        private async Task UpdateFlight(Flight flightGet, int count)
-        {
-            string baseUri = "https://localhost:7034/";
-            string requestUri = $"UpdateFlight/{flightGet.Id}";
-
-            var updatedFlight = new
-            {
-                Id = flightGet.Id,
-                Sales = flightGet.Sales - count,
-                Status = flightGet.Status
-            };
-
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(updatedFlight);
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-            try
-            {
-                using HttpClient httpClient = new HttpClient();
-                HttpResponseMessage response = await httpClient.PutAsync(baseUri + requestUri, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("Atualização do voo bem-sucedida!");
-                }
-                else
-                {
-                    Console.WriteLine($"Erro ao atualizar o voo. Código de status: {response.StatusCode}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao atualizar o voo: {ex.Message}");
-            }
-        }
+        
 
 
         private bool validFlight(Flight flight)
