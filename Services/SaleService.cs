@@ -60,12 +60,12 @@ namespace Services
 
         private Flight returnFlight(int flight)
         {
-            string baseUri = "https://localhost:7034/";
-            string requestUri = $"GetFlights/{flight}";
+            string baseUri = "https://localhost:7258";
+            string requestUri = $"/api/Flights/{flight}";
 
-            return ApiConsume<Flight>.Get(baseUri, requestUri).Result;
-          
-
+            var flightReturn = ApiConsume<Flight>.Get(baseUri, requestUri).Result;
+            flightReturn.Id = flight;
+            return flightReturn;
         }
 
         private bool NotDuplicateCPF(Sale sale)
@@ -108,8 +108,8 @@ namespace Services
 
         private bool validFlight(Flight flight)
         {
-            string baseUri = "https://localhost:7034/";
-            string requestUri = $"GetFlights/{flight.Id}";
+            string baseUri = "https://localhost:7258/";
+            string requestUri = $"/api/Flights/{flight.Id}";
 
             var flightGet = ApiConsume<Flight>.Get(baseUri, requestUri).Result;
 

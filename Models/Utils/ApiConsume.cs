@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using Newtonsoft.Json;
+using System.Net.Http.Json;
 
 namespace Models.Utils
 {
@@ -16,7 +17,9 @@ namespace Models.Utils
                 HttpResponseMessage response = await client.GetAsync(requestUri);
 
                 response.EnsureSuccessStatusCode();
-                generics = await response.Content.ReadFromJsonAsync<T>();
+                //generics = await response.Content.ReadFromJsonAsync<T>();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                generics = JsonConvert.DeserializeObject<T>(responseBody);
             }
             catch (Exception)
             {

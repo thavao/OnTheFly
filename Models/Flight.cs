@@ -10,7 +10,8 @@ namespace Models
 {
     public class Flight
     {
-        [JsonProperty("flight_number")]
+        [JsonProperty("flightNumber")]
+        [JsonPropertyName("flightNumber")]
         public int Id { get; set; }
         public int Sales { get; set; }
         public bool Status { get; set; }

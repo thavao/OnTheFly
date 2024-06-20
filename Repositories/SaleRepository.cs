@@ -16,7 +16,7 @@ namespace Repositories
             _conn = "Data Source=127.0.0.1; Initial Catalog=DbSales; User Id=sa; Password=SqlServer2019!; TrustServerCertificate=Yes";
 
             _passengerUri = "https://localhost:7298";
-            _flightUri = "https://localhost:7034";
+            _flightUri = "https://localhost:7258";
         }
 
         public async Task<List<Sale>> GetSale()
@@ -26,7 +26,7 @@ namespace Repositories
             connection.Open();
 
             var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/api/Passengers");
-            var t2 = ApiConsume<List<Flight>>.Get(_flightUri, "/GetFlights");
+            var t2 = ApiConsume<List<Flight>>.Get(_flightUri, "/api/Flights");
             var t3 = connection.QueryAsync<dynamic>(Sale.GetPassengers);
 
             await Task.WhenAll(t1, t2, t3);
@@ -79,7 +79,7 @@ namespace Repositories
                 return null;
 
             var t1 = ApiConsume<List<Passenger>>.Get(_passengerUri, "/api/Passengers");
-            var t2 = ApiConsume<Flight>.Get(_flightUri, $"/GetFlights/{row.FlightId}");
+            var t2 = ApiConsume<Flight>.Get(_flightUri, $"/api/Flights/{row.FlightId}");
             var t3 = connection.QueryAsync<string>(Sale.GetPassengersById, new { SaleId = id });
 
             await Task.WhenAll(t1, t2, t3);
@@ -231,10 +231,11 @@ namespace Repositories
 
         public async Task UpdateFlight(int flightId, int count, string operation)
         {
-            string baseUri = "https://localhost:7034/";
-            string requestUri = $"CheckSeats/{flightId}/{operation}/{count}";
+            string baseUri = "https://localhost:7258";
+            string requestUri = $"/api/Flights/CheckSeats/{flightId}/{operation}/{count}";
             try
             {
+
                 using HttpClient httpClient = new HttpClient();
                 HttpResponseMessage response = await httpClient.PatchAsync(baseUri + requestUri, null);
                 if (response.IsSuccessStatusCode)
