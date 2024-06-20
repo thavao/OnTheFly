@@ -107,9 +107,7 @@ namespace Repositories
 
         public Sale Post(Sale sale)
         {
-            string strConn = "Data Source=127.0.0.1;Initial Catalog=DBSales;User Id=sa;Password=SqlServer2019!;TrustServerCertificate=Yes;";
-
-            using (var connection = new SqlConnection(strConn))
+            using (var connection = new SqlConnection(_conn))
             {
                 connection.Open();
 
@@ -121,8 +119,8 @@ namespace Repositories
                 {
                     FlightId = sale.Flight.Id,
                     CpfBuyer = sale.Passengers[0].CPF,
-                    Reserved = sale.Reserved,
-                    Sold = sale.Sold
+                    Reserved = true,
+                    Sold = false
                 });
 
                 foreach (var passenger in sale.Passengers)

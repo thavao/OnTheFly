@@ -21,5 +21,16 @@ namespace Models
         //public string CpfBuyer { get; set; }
         public bool Reserved { get; set; }
         public bool Sold { get; set; }
+
+        public Sale() { }
+
+        public Sale(SaleDTO dto)
+        {
+            Flight = new Flight { Id = dto.Flight };
+            Passengers = dto.Passengers?.Select(p => new Passenger { CPF = p }).ToList() ?? new List<Passenger>();
+            Reserved = true;
+            Sold = false;
+
+        }
     }
 }

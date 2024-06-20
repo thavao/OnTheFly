@@ -40,17 +40,15 @@ namespace ReserveConsumer
 
                     var message = Encoding.UTF8.GetString(body);
 
-                    var sale = JsonConvert.DeserializeObject<Sale>(message);
+                    var sale = JsonConvert.DeserializeObject<SaleDTO>(message);
 
-                    // Do something with the sale
-                    sale = service.Post(sale);
+                    sale = service.Post(sale).Result;
 
                     if (sale == null)
                         Console.WriteLine("Houve um erro ao inserir a venda");
                     else
                         Console.WriteLine("Venda inserida com sucesso");
 
-                    // Acknowledge the message
                     channel.BasicAck(ea.DeliveryTag, false);
                 };
 

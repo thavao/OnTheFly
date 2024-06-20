@@ -77,7 +77,7 @@ namespace OnTheFly.SalesAPI.Controllers
         // POST: api/Sales
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Sale>> PostSale(Sale sale)
+        public async Task<ActionResult<Sale>> PostSale(SaleDTO dto)
         {
             using var connection = _factory.CreateConnection();
             using var channel = connection.CreateModel();
@@ -91,7 +91,7 @@ namespace OnTheFly.SalesAPI.Controllers
                 arguments: null
                 );
 
-            string saleAsStr = JsonConvert.SerializeObject(sale);
+            string saleAsStr = JsonConvert.SerializeObject(dto);
             var saleAsBytes = Encoding.UTF8.GetBytes(saleAsStr);
 
 
