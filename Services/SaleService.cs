@@ -106,22 +106,12 @@ namespace Services
         private async Task UpdateFlight(Flight flightGet, int count)
         {
             string baseUri = "https://localhost:7034/";
-            string requestUri = $"UpdateFlight/{flightGet.Id}";
-
-            var updatedFlight = new
-            {
-                Id = flightGet.Id,
-                Sales = flightGet.Sales - count,
-                Status = flightGet.Status
-            };
-
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(updatedFlight);
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            string requestUri = $"UpdateFlight/{flightGet.Id}/{count}";
 
             try
             {
                 using HttpClient httpClient = new HttpClient();
-                HttpResponseMessage response = await httpClient.PutAsync(baseUri + requestUri, content);
+                HttpResponseMessage response = await httpClient.PatchAsync(baseUri + requestUri, null);
 
                 if (response.IsSuccessStatusCode)
                 {

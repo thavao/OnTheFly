@@ -79,30 +79,36 @@ namespace OnTheFly.SalesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Sale>> PostSale(SaleDTO dto)
         {
-            using var connection = _factory.CreateConnection();
-            using var channel = connection.CreateModel();
+            try
+            {
+                using var connection = _factory.CreateConnection();
+                using var channel = connection.CreateModel();
 
-            // Declare the queue
-            channel.QueueDeclare(
-                queue: QUEUE_NAME,
-                durable: false,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null
-                );
+                // Declare the queue
+                channel.QueueDeclare(
+                    queue: QUEUE_NAME,
+                    durable: false,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null
+                    );
 
-            string saleAsStr = JsonConvert.SerializeObject(dto);
-            var saleAsBytes = Encoding.UTF8.GetBytes(saleAsStr);
+                string saleAsStr = JsonConvert.SerializeObject(dto);
+                var saleAsBytes = Encoding.UTF8.GetBytes(saleAsStr);
 
 
-            channel.BasicPublish(
-                exchange: "",
-                routingKey: QUEUE_NAME,
-                basicProperties: null,
-                body: saleAsBytes
-                );
+                channel.BasicPublish(
+                    exchange: "",
+                    routingKey: QUEUE_NAME,
+                    basicProperties: null,
+                    body: saleAsBytes
+                    );
 
-            return Accepted();
+                return Accepted();
+            } catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
         }
 
         // DELETE: api/Sales/5
