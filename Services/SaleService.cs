@@ -26,14 +26,46 @@ namespace Services
             return await _saleRepository.GetSale(id);
         }
 
-        public Sale Post(Sale sale)
+        public async Task<SaleDTO> Post(SaleDTO saleDTO)
         {
+            Sale sale = new Sale(saleDTO);
+            sale.Flight = returnFlight(saleDTO.Flight);
+            sale.Passengers = returnPassagers(saleDTO.Passengers);
+
             if (ValidCPF(sale.Passengers) && NotDuplicateCPF(sale) && validFlight(sale.Flight) && validCount(sale.Flight.Id, sale.Passengers.Count))
             {
-                return _saleRepository.Post(sale);
+                _saleRepository.Post(sale);
 
+                return saleDTO;
             } 
             return null;
+        }
+
+        private List<Passenger> returnPassagers(List<string> passengers)
+        {
+            string baseUri = "https://localhost:7034/";
+            List<Passenger> passagersList = new List<Passenger>();
+
+            foreach (var passenger in passengers)
+            {
+                string requestUri = $"GetPassengers/{passenger}";
+                var p = ApiConsume<Passenger>.Get(baseUri, requestUri).Result;
+
+                passagersList.Add(p);
+            }
+
+            return passagersList;
+
+        }
+
+        private Flight returnFlight(int flight)
+        {
+            string baseUri = "https://localhost:7034/";
+            string requestUri = $"GetFlights/{flight}";
+
+            return ApiConsume<Flight>.Get(baseUri, requestUri).Result;
+          
+
         }
 
         private bool NotDuplicateCPF(Sale sale)
@@ -59,12 +91,10 @@ namespace Services
 
         private bool validCount(int id, int count)
         {
-            string baseUri = "https://localhost:7034/";
-            string requestUri = $"GetFlights/{id}";
+            var flightGet = returnFlight(id);
 
-            var flightGet = ApiConsume<Flight>.Get(baseUri, requestUri).Result;
-           
-            if(flightGet.Sales < count)
+
+            if (flightGet.Sales < count)
             {
                 return false;
             }
@@ -153,7 +183,7 @@ namespace Services
 
             foreach (var passenger in passengers)
             {
-                if (!listPassengers.Any(p => p.CPF == passenger.CPF))
+                if (!listPassengers.Any(p => p.CPF == passenger.CPF) ||passenger.Status == false)
                 {
                     return false;
                 }
