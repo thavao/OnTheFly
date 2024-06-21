@@ -30,7 +30,104 @@ Após o cadastro de voos, as passagens ficam disponíveis para serem vendidas de
 - **Parâmetros**: Nenhum.
 - **Exemplo de Resposta**:
   ```json
-    {"Inserir resposta aqui"}
+  [
+    {
+        "id": 1,
+        "flight": {
+            "flightNumber": 1277,
+            "sales": 25,
+            "status": true
+        },
+        "passengers": [
+            {
+                "cpf": "150.106.910-19",
+                "name": "Ana",
+                "dtBirth": "2000-04-30T00:00:00",
+                "status": false
+            },
+            {
+                "cpf": "237.651.750-80",
+                "name": "Mariana",
+                "dtBirth": "1985-09-23T00:00:00",
+                "status": false
+            },
+            {
+                "cpf": "263.963.420-81",
+                "name": "Fernando",
+                "dtBirth": "1978-12-05T00:00:00",
+                "status": false
+            }
+        ],
+        "reserved": true,
+        "sold": false
+    },
+    {
+        "id": 2,
+        "flight": {
+            "flightNumber": 1300,
+            "sales": 12,
+            "status": true
+        },
+        "passengers": [
+            {
+                "cpf": "150.106.910-19",
+                "name": "Ana",
+                "dtBirth": "2000-04-30T00:00:00",
+                "status": false
+            },
+            {
+                "cpf": "237.651.750-80",
+                "name": "Mariana",
+                "dtBirth": "1985-09-23T00:00:00",
+                "status": false
+            },
+            {
+                "cpf": "263.963.420-81",
+                "name": "Fernando",
+                "dtBirth": "1978-12-05T00:00:00",
+                "status": false
+            }
+        ],
+        "reserved": true,
+        "sold": false
+    },
+    {
+        "id": 3,
+        "flight": {
+            "flightNumber": 1401,
+            "sales": 45,
+            "status": true
+        },
+        "passengers": [
+            {
+                "cpf": "150.106.910-19",
+                "name": "Ana",
+                "dtBirth": "2000-04-30T00:00:00",
+                "status": false
+            }
+        ],
+        "reserved": true,
+        "sold": false
+    },
+    {
+        "id": 4,
+        "flight": {
+            "flightNumber": 1277,
+            "sales": 25,
+            "status": true
+        },
+        "passengers": [
+            {
+                "cpf": "312.905.760-92",
+                "name": "Carlos",
+                "dtBirth": "1990-06-15T00:00:00",
+                "status": false
+            }
+        ],
+        "reserved": false,
+        "sold": false
+    }
+  ]
   ```
 
 ### 2. Encontrar uma venda
@@ -41,7 +138,36 @@ Após o cadastro de voos, as passagens ficam disponíveis para serem vendidas de
     - **id**: int
 - **Exemplo de Resposta**:
     ```json
-    {"Inserir resposta aqui"}
+    {
+      "id": 2,
+      "flight": {
+          "flightNumber": 1300,
+          "sales": 12,
+          "status": true
+      },
+      "passengers": [
+          {
+              "cpf": "150.106.910-19",
+              "name": "Ana",
+              "dtBirth": "2000-04-30T00:00:00",
+              "status": false
+          },
+          {
+              "cpf": "237.651.750-80",
+              "name": "Mariana",
+              "dtBirth": "1985-09-23T00:00:00",
+              "status": false
+          },
+          {
+              "cpf": "263.963.420-81",
+              "name": "Fernando",
+              "dtBirth": "1978-12-05T00:00:00",
+              "status": false
+          }
+      ],
+    "reserved": true,
+    "sold": false
+   }
     ```
 
 ### 3. Cadastrar uma venda
@@ -51,11 +177,17 @@ Após o cadastro de voos, as passagens ficam disponíveis para serem vendidas de
 - **Parâmetros**: Nenhum.
 - **Corpo da requisição**:
     ```json
-    {"Inserir requisição aqui"}
+    {
+      "Flight": 1277,
+      "Passengers":[
+          "312.905.760-92",
+          "150.106.910-19"
+      ]
+    }
     ```
 - **Exemplo de Resposta**:
     ```json
-    {"Inserir resposta aqui"}
+    sem resposta
     ```
 
 ### 4. Completar uma venda
@@ -64,13 +196,10 @@ Após o cadastro de voos, as passagens ficam disponíveis para serem vendidas de
 - **Descrição**: Muda o status de uma venda para vendido.
 - **Parâmetros**:
     - **id**: int
-- **Corpo da requisição**:
-    ```json
-    {"Inserir requisição aqui"}
-    ```
+      
 - **Exemplo de Resposta**:
     ```json
-    {"Inserir resposta aqui"}
+    sem resposta
     ```
     
 ### 5. Remover uma venda
